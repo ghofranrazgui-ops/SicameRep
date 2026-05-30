@@ -1,0 +1,228 @@
+<div class="page">
+
+  <!-- ══ HEADER ══════════════════════════════════════════════ -->
+  <header class="hdr">
+    <div class="hdr-left">
+      <a class="back" routerLink="/">← Dashboard</a>
+      <div>
+        <div class="page-title">ANALYTICS</div>
+        <div class="page-sub">Productivity &amp; Energy Intelligence</div>
+      </div>
+    </div>
+
+    <!-- Period selector -->
+    <div class="periods">
+      @for (p of periods; track p.key) {
+        <button class="period-btn" [class.period-btn--on]="selPeriod()===p.key"
+                (click)="setPeriod(p.key)">{{ p.label }}</button>
+      }
+      @if (selPeriod()==='custom') {
+        <div class="custom-range">
+          <input type="date" [(ngModel)]="customFrom" (change)="load()"/>
+          <span>→</span>
+          <input type="date" [(ngModel)]="customTo" (change)="load()"/>
+        </div>
+      }
+    </div>
+  </header>
+
+  <!-- ══ KPI STRIP ════════════════════════════════════════════ -->
+  @if (globalData() && !selMachine()) {
+    <div class="kpi-strip">
+      <div class="kpi" [class.kpi--green]="(globalData()!.overallProductivityPct)>97"
+                       [class.kpi--amber]="(globalData()!.overallProductivityPct)<=97">
+        <div class="kpi-v">{{ globalData()!.overallProductivityPct | number:'1.1-1' }}%</div>
+        <div class="kpi-l">Overall Productivity</div>
+      </div>
+      <div class="kpi kpi--red">
+        <div class="kpi-v">{{ globalData()!.totalLostHours | number:'1.0-1' }}h</div>
+        <div class="kpi-l">Total Lost Hours</div>
+      </div>
+      <div class="kpi kpi--orange">
+        <div class="kpi-v">{{ globalData()!.totalEnergyWastedKwh | number:'1.0-0' }} kWh</div>
+        <div class="kpi-l">Energy Wasted</div>
+      </div>
+      <div class="kpi kpi--purple">
+        <div class="kpi-v">{{ globalData()!.carbonImpactKg | number:'1.0-0' }} kg</div>
+        <div class="kpi-l">CO₂ Impact</div>
+      </div>
+      <div class="kpi" [class.kpi--green]="effPct()>95" [class.kpi--amber]="effPct()<=95">
+        <div class="kpi-v">{{ effPct() | number:'1.1-1' }}%</div>
+        <div class="kpi-l">Energy Efficiency</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-v kpi-v--sm">{{ globalData()!.period }}</div>
+        <div class="kpi-l">Period</div>
+      </div>
+    </div>
+  }
+
+  @if (machineData() && selMachine()) {
+    <div class="kpi-strip">
+      <div class="kpi" [class.kpi--green]="machineData()!.productivityPct>97"
+                       [class.kpi--amber]="machineData()!.productivityPct<=97">
+        <div class="kpi-v">{{ machineData()!.productivityPct | number:'1.1-1' }}%</div>
+        <div class="kpi-l">Productivity</div>
+      </div>
+      <div class="kpi kpi--red">
+        <div class="kpi-v">{{ machineData()!.lostHoursTotal | number:'1.0-1' }}h</div>
+        <div class="kpi-l">Lost Hours</div>
+      </div>
+      <div class="kpi kpi--orange">
+        <div class="kpi-v">{{ machineData()!.energyWastedKwh | number:'1.0-0' }} kWh</div>
+        <div class="kpi-l">Energy Wasted</div>
+      </div>
+      <div class="kpi kpi--purple">
+        <div class="kpi-v">{{ machineData()!.carbonImpactKg | number:'1.0-1' }} kg</div>
+        <div class="kpi-l">CO₂ Impact</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-v">{{ machineData()!.powerKw }} kW</div>
+        <div class="kpi-l">Rated Power</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-v kpi-v--sm">{{ machineData()!.period }}</div>
+        <div class="kpi-l">Period</div>
+      </div>
+    </div>
+  }
+
+  <!-- ══ MACHINE SELECTOR ═════════════════════════════════════ -->
+  <div class="machine-bar">
+    <span class="mbar-lbl">View:</span>
+    <button class="mchip" [class.mchip--on]="!selMachine()" (click)="selectMachine(null)">
+      ⬡ All Machines
+    </button>
+    @for (eq of equipment(); track track($index, eq)) {
+      <button class="mchip" [class.mchip--on]="selMachine()===eq.machineCode"
+              (click)="selectMachine(eq.machineCode)" [title]="eq.name">
+        {{ eq.machineCode }}
+      </button>
+    }
+  </div>
+
+  <!-- ══ LOADING ══════════════════════════════════════════════ -->
+  @if (loading()) {
+    <div class="loading-wrap">
+      <div class="spinner"></div>
+      <p>Computing productivity…</p>
+    </div>
+  } @else {
+
+    <!-- ══ CHARTS ════════════════════════════════════════════ -->
+    <div class="charts-grid">
+
+      <!-- 1. Productivity hours timeline -->
+      <div class="chart-card chart-wide">
+        <div class="cc-hdr">
+          <div class="cc-title">Daily Productivity — Ideal vs Actual vs Lost (hours)</div>
+          <div class="cc-legend">
+            <span class="leg" style="--lc:#10b981">Ideal</span>
+            <span class="leg" style="--lc:#f59e0b">Actual</span>
+            <span class="leg" style="--lc:#ef4444">Lost</span>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas #chartProd></canvas></div>
+      </div>
+
+      <!-- 2. Productivity % trend -->
+      <div class="chart-card">
+        <div class="cc-hdr"><div class="cc-title">Daily Productivity % Trend</div></div>
+        <div class="chart-wrap"><canvas #chartPct></canvas></div>
+      </div>
+
+      <!-- 3. Energy consumed vs wasted -->
+      <div class="chart-card">
+        <div class="cc-hdr">
+          <div class="cc-title">Energy — Consumed vs Wasted (kWh)</div>
+          <div class="cc-sub">30% idle draw during breakdown hours</div>
+        </div>
+        <div class="chart-wrap"><canvas #chartEnergy></canvas></div>
+      </div>
+
+      <!-- 4. Cumulative energy waste -->
+      <div class="chart-card" [class.chart-wide]="!!selMachine()">
+        <div class="cc-hdr">
+          <div class="cc-title">Cumulative Energy Waste (kWh)</div>
+          <div class="cc-sub">Area = carbon footprint of all breakdowns</div>
+        </div>
+        <div class="chart-wrap"><canvas #chartCumul></canvas></div>
+      </div>
+
+      <!-- 5. Per-machine bar (global only) -->
+      @if (!selMachine() && globalData()) {
+        <div class="chart-card chart-wide">
+          <div class="cc-hdr"><div class="cc-title">Productivity % by Machine</div></div>
+          <div class="chart-wrap chart-wrap--tall"><canvas #chartBar></canvas></div>
+        </div>
+
+        <!-- 6. Category donut -->
+        <div class="chart-card">
+          <div class="cc-hdr"><div class="cc-title">Productivity % by Category</div></div>
+          <div class="chart-wrap"><canvas #chartDonut></canvas></div>
+        </div>
+      }
+
+      <!-- 7. ML Feature importance -->
+      @if (features().length) {
+        <div class="chart-card" [class.chart-wide]="!!selMachine()">
+          <div class="cc-hdr">
+            <div class="cc-title">ML Feature Importance (Cox + RF)</div>
+            <div class="cc-sub">Drivers of breakdown risk</div>
+          </div>
+          <div class="chart-wrap"><canvas #chartFeat></canvas></div>
+        </div>
+      }
+
+    </div>
+
+    <!-- ══ DATA TABLE ════════════════════════════════════════ -->
+    @if (series().length) {
+      <div class="table-section">
+        <div class="ts-hdr">
+          <div class="ts-title">Daily Detail Log</div>
+          <div class="ts-sub">{{ series().length }} working days</div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Date</th><th>Ideal (h)</th><th>Actual (h)</th>
+                <th>Lost (h)</th><th>Productivity</th>
+                <th>Energy (kWh)</th><th>Wasted (kWh)</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (d of series(); track d.date) {
+                <tr [class.tr-bd]="d.hadBreakdown">
+                  <td class="td-date">{{ d.date }}</td>
+                  <td>{{ d.idealHours | number:'1.0-1' }}</td>
+                  <td>{{ d.actualHours | number:'1.0-1' }}</td>
+                  <td [class.td-loss]="d.lostHours>0">{{ d.lostHours | number:'1.0-2' }}</td>
+                  <td>
+                    <div class="pbar-wrap">
+                      <div class="pbar"
+                        [class.pbar--ok]="d.productivityPct>97"
+                        [class.pbar--warn]="d.productivityPct>85&&d.productivityPct<=97"
+                        [class.pbar--bad]="d.productivityPct<=85"
+                        [style.width.%]="d.productivityPct"></div>
+                      <span>{{ d.productivityPct | number:'1.1-1' }}%</span>
+                    </div>
+                  </td>
+                  <td>{{ d.energyConsumedKwh | number:'1.0-0' }}</td>
+                  <td [class.td-loss]="d.energyWastedKwh>0">{{ d.energyWastedKwh | number:'1.0-2' }}</td>
+                  <td>
+                    <span class="sc" [class.sc-ok]="!d.hadBreakdown" [class.sc-err]="d.hadBreakdown">
+                      {{ d.hadBreakdown ? '⚠ BD' : '✓ OK' }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+  }
+</div>

@@ -1,0 +1,376 @@
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="hdr">
+    <div class="brand">
+      <span class="brand-hex">⬡</span>
+      <div>
+        <div class="brand-name">SICAME</div>
+        <div class="brand-sub">Predictive Maintenance Intelligence</div>
+      </div>
+    </div>
+    <div class="hdr-kpis">
+      <div class="kpi" [class.kpi--red]="critical()>0">
+        <span class="kpi-n">{{ critical() }}</span><span class="kpi-l">Critical</span>
+      </div>
+      <div class="kpi" [class.kpi--orange]="high()>0">
+        <span class="kpi-n">{{ high() }}</span><span class="kpi-l">High Risk</span>
+      </div>
+      <div class="kpi" [class.kpi--red]="down()>0">
+        <span class="kpi-n">{{ down() }}</span><span class="kpi-l">Down Now</span>
+      </div>
+      <div class="kpi kpi--amber">
+        <span class="kpi-n">{{ ciStr() }}</span><span class="kpi-l">Cox C-Index</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-n">{{ total() }}</span><span class="kpi-l">Machines</span>
+      </div>
+    </div>
+    <div class="hdr-actions">
+      <div class="ml-pill" [class.ml-ok]="mlHealthy()" [class.ml-off]="!mlHealthy()">
+        <span class="ml-dot"></span>ML {{ mlHealthy() ? 'LIVE' : 'OFFLINE' }}
+      </div>
+      <button class="btn btn--amber" (click)="retrain()" [disabled]="retraining()">
+        <span [class.spinning]="retraining()">⟳</span>
+        {{ retraining() ? 'Retraining…' : 'Retrain ML' }}
+      </button>
+      <a class="btn btn--blue" routerLink="/analytics">Analytics →</a>
+    </div>
+  </header>
+
+  <!-- FILTERS -->
+  <div class="filterbar">
+    <div class="pills">
+      <button class="pill" [class.pill--on]="selTier()==='ALL'" (click)="setTier('ALL')">
+        ALL <span class="pill-n">{{ total() }}</span>
+      </button>
+      @for (t of tiers; track t) {
+        <button class="pill" [attr.data-risk]="t" [class.pill--on]="selTier()===t" (click)="setTier(t)">
+          <span class="pill-dot"></span>{{ t }}<span class="pill-n">{{ countTier(t) }}</span>
+        </button>
+      }
+    </div>
+    <div class="filter-right">
+      <div class="search-wrap">
+        <span class="search-ico">⌕</span>
+        <input class="search" type="text" placeholder="Search machine…" [(ngModel)]="searchTerm"/>
+      </div>
+      <select class="sel" [(ngModel)]="selCat">
+        <option value="">All categories</option>
+        @for (c of cats(); track c) { <option [value]="c">{{ c }}</option> }
+      </select>
+    </div>
+  </div>
+
+  <!-- FLOOR -->
+  @if (loading()) {
+    <div class="floor">
+      @for (i of [0,1,2,3,4,5,6,7,8,9,10,11]; track i) {
+        <div class="card card--skel">
+          <div class="skeleton" style="height:3px"></div>
+          <div style="padding:12px;display:flex;flex-direction:column;gap:8px">
+            <div class="skeleton" style="height:14px;width:55%"></div>
+            <div class="skeleton" style="height:10px;width:85%"></div>
+            <div class="skeleton" style="height:5px;width:100%;margin-top:6px"></div>
+            <div class="skeleton" style="height:38px;width:100%;border-radius:6px;margin-top:4px"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (filtered().length === 0) {
+    <div class="empty">
+      <div class="empty-ico">⬡</div>
+      <p>No machines match your filters.</p>
+      <button class="btn btn--dim" (click)="setTier('ALL');searchTerm='';selCat=''">Clear filters</button>
+    </div>
+  } @else {
+    <main class="floor">
+      @for (m of filtered(); track track($index, m)) {
+        <div class="card" [attr.data-risk]="m.riskTier" [class.card--down]="m.isCurrentlyDown"
+             (click)="openPanel(m)">
+          <div class="card-strip"></div>
+          <div class="card-top">
+            <span class="card-code">{{ m.machineCode }}</span>
+            <span class="card-badge">{{ m.riskTier }}</span>
+          </div>
+          <div class="card-name" [title]="m.machineName || ''">
+            {{ (m.machineName || '') | slice:0:28 }}{{ (m.machineName?.length ?? 0) > 28 ? '…' : '' }}
+          </div>
+          <div class="card-cat">{{ m.category }}</div>
+          <div class="gauge">
+            <div class="gauge-row">
+              <span class="gauge-lbl">Hazard Score</span>
+              <span class="gauge-val">{{ hazardPct(m) }}%</span>
+            </div>
+            <div class="gauge-track"><div class="gauge-fill" [style.width.%]="hazardPct(m)"></div></div>
+          </div>
+          <div class="chips">
+            @for (c of [{v:m.survival7d,l:'7d'},{v:m.survival14d,l:'14d'},{v:m.survival30d,l:'30d'}]; track c.l) {
+              <div class="chip">
+                <span class="chip-v">{{ c.v | percent:'1.0-0' }}</span>
+                <span class="chip-l">{{ c.l }}</span>
+              </div>
+            }
+          </div>
+          <div class="stats">
+            <div class="stat"><span class="stat-v">{{ m.cumBreakdowns }}</span><span class="stat-l">Breaks</span></div>
+            <div class="stat"><span class="stat-v">{{ m.totalDowntimeH | number:'1.0-1' }}h</span><span class="stat-l">Downtime</span></div>
+            <div class="stat"><span class="stat-v">{{ m.daysUntilPredictedNext > 0 ? m.daysUntilPredictedNext+'d' : 'N/A' }}</span><span class="stat-l">Next Est.</span></div>
+          </div>
+          @if (m.pipeline2 && !m.pipeline2.error) {
+            <div class="card-p2-hint">
+              <span class="p2-dot">⊕</span>
+              <span>{{ m.pipeline2.daysToFailure | number:'1.0-0' }}d · {{ m.pipeline2.breakdownIn30d | number:'1.0-0' }}% 30d</span>
+            </div>
+          }
+        </div>
+      }
+    </main>
+  }
+</div>
+
+<!-- SIDE PANEL -->
+@if (panel()) {
+  <div class="overlay" (click)="closePanel()"></div>
+  <aside class="panel" [attr.data-risk]="panel()!.riskTier">
+
+    <div class="panel-hdr">
+      <div>
+        <div class="panel-code">{{ panel()!.machineCode }}</div>
+        <div class="panel-name">{{ panel()!.machineName }}</div>
+        <div class="panel-cat">{{ panel()!.category }}</div>
+      </div>
+      <button class="close-btn" (click)="closePanel()">✕</button>
+    </div>
+
+    <div class="panel-body">
+
+      <!-- ══ DUAL PIPELINE CARDS ══════════════════════════════ -->
+      <div class="dual-grid">
+
+        <!-- Pipeline 1 — Cox PH -->
+        <div class="pipe-card pipe1">
+          <div class="pipe-header">
+            <div class="pipe-icon">⊛</div>
+            <div>
+              <div class="pipe-title">Cox PH Survival Model</div>
+              <div class="pipe-sub">Survival analysis · time-to-failure</div>
+            </div>
+            <div class="pipe-badge p1-badge">Pipeline 1</div>
+          </div>
+
+          <div class="pipe-row">
+            <span class="pipe-lbl">hazard_score</span>
+            <div class="pipe-bar-wrap">
+              <div class="pipe-bar" [style.width.%]="panel()!.hazardScore*100" [attr.data-risk]="panel()!.riskTier"></div>
+            </div>
+            <span class="pipe-val-hi">{{ panel()!.hazardScore | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="pipe-row">
+            <span class="pipe-lbl">risk_tier</span>
+            <span class="pipe-tier" [attr.data-risk]="panel()!.riskTier">{{ panel()!.riskTier }}</span>
+          </div>
+
+          <div class="pipe-row">
+            <span class="pipe-lbl">days_predicted</span>
+            <span class="pipe-val">≈ {{ panel()!.daysUntilPredictedNext > 0 ? panel()!.daysUntilPredictedNext : 'N/A' }} days</span>
+          </div>
+
+          <div class="pipe-row">
+            <span class="pipe-lbl">model</span>
+            <span class="pipe-val-dim">Cox PH + Breslow</span>
+          </div>
+
+          <div class="pipe-surv-chips">
+            @for (s of [
+              {l:'7-day survival', v:panel()!.survival7d},
+              {l:'14-day survival',v:panel()!.survival14d},
+              {l:'30-day survival',v:panel()!.survival30d}
+            ]; track s.l) {
+              <div class="surv-chip" [class.surv-ok]="s.v>0.7" [class.surv-warn]="s.v>0.4&&s.v<=0.7" [class.surv-bad]="s.v<=0.4">
+                <span class="surv-pct">{{ s.v | percent:'1.0-0' }}</span>
+                <span class="surv-lbl">{{ s.l }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Pipeline 2 — Classical ML -->
+        @if (panel()!.pipeline2 && !panel()!.pipeline2!.error) {
+          <div class="pipe-card pipe2">
+            <div class="pipe-header">
+              <div class="pipe-icon pipe-icon2">⊕</div>
+              <div>
+                <div class="pipe-title">Classical ML Pipeline</div>
+                <div class="pipe-sub">Regression + classification</div>
+              </div>
+              <div class="pipe-badge p2-badge">Pipeline 2</div>
+            </div>
+
+            <div class="pipe-row">
+              <span class="pipe-lbl">days_to_failure</span>
+              <span class="pipe-val-hi p2-hi">{{ panel()!.pipeline2!.daysToFailure | number:'1.0-1' }} days</span>
+            </div>
+
+            <div class="pipe-row">
+              <span class="pipe-lbl">breakdown_in_30d</span>
+              <span class="pipe-val-hi" [class.prob-red]="panel()!.pipeline2!.breakdownIn30d>60"
+                    [class.prob-orange]="panel()!.pipeline2!.breakdownIn30d>30&&panel()!.pipeline2!.breakdownIn30d<=60"
+                    [class.prob-green]="panel()!.pipeline2!.breakdownIn30d<=30">
+                {{ panel()!.pipeline2!.breakdownIn30d | number:'1.0-0' }}% probability
+              </span>
+            </div>
+
+            <div class="pipe-row">
+              <span class="pipe-lbl">breakdown_in_14d</span>
+              <span class="pipe-val-hi" [class.prob-red]="panel()!.pipeline2!.breakdownIn14d>60"
+                    [class.prob-orange]="panel()!.pipeline2!.breakdownIn14d>30&&panel()!.pipeline2!.breakdownIn14d<=60"
+                    [class.prob-green]="panel()!.pipeline2!.breakdownIn14d<=30">
+                {{ panel()!.pipeline2!.breakdownIn14d | number:'1.0-0' }}% probability
+              </span>
+            </div>
+
+            <div class="pipe-row">
+              <span class="pipe-lbl">best_regressor</span>
+              <span class="pipe-val-dim">{{ panel()!.pipeline2!.bestRegressorName }}
+                <span class="pipe-metric">(MAE {{ panel()!.pipeline2!.bestRegressorMae | number:'1.0-1' }}d)</span>
+              </span>
+            </div>
+
+            <div class="pipe-row">
+              <span class="pipe-lbl">best_classifier</span>
+              <span class="pipe-val-dim">{{ panel()!.pipeline2!.bestClassifierName }}
+                <span class="pipe-metric">(AUC {{ panel()!.pipeline2!.bestClassifierAuc | number:'1.2-2' }})</span>
+              </span>
+            </div>
+
+            <div class="time-saved-box">
+              <div class="ts-lbl">Time saved if preventive action taken now</div>
+              <div class="ts-val">+{{ panel()!.pipeline2!.timeSavedH | number:'1.1-1' }} h</div>
+              <div class="ts-sub">vs. waiting for corrective breakdown</div>
+            </div>
+          </div>
+        } @else {
+          <div class="pipe-card pipe2 pipe2-na">
+            <div class="pipe-header">
+              <div class="pipe-icon pipe-icon2">⊕</div>
+              <div>
+                <div class="pipe-title">Classical ML Pipeline</div>
+                <div class="pipe-sub">Regression + classification</div>
+              </div>
+              <div class="pipe-badge p2-badge">Pipeline 2</div>
+            </div>
+            <div class="pipe-na">
+              <span>Insufficient corrective history<br>(&lt;2 events required)</span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Survival bars -->
+      <div class="psect">
+        <div class="psect-ttl">Survival Probability (Cox PH)</div>
+        @for (row of [
+          {l:'Next 7 days', v:panel()!.survival7d},
+          {l:'Next 14 days',v:panel()!.survival14d},
+          {l:'Next 30 days',v:panel()!.survival30d}
+        ]; track row.l) {
+          <div class="srow">
+            <span class="srow-l">{{ row.l }}</span>
+            <div class="srow-track">
+              <div class="srow-fill"
+                [class.fill-ok]="row.v>0.7"
+                [class.fill-warn]="row.v>0.4&&row.v<=0.7"
+                [class.fill-bad]="row.v<=0.4"
+                [style.width.%]="row.v*100"></div>
+            </div>
+            <span class="srow-v">{{ row.v | percent:'1.1-1' }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Risk distribution -->
+      <div class="psect">
+        <div class="psect-ttl">Risk Distribution</div>
+        @for (t of tiers; track t) {
+          <div class="drow">
+            <span class="drow-l" [attr.data-tier]="t">{{ t }}</span>
+            <div class="drow-track">
+              <div class="drow-fill" [attr.data-tier]="t"
+                [style.width.%]="(panel()!.riskProbabilities[t]||0)*100"></div>
+            </div>
+            <span class="drow-v">{{ ((panel()!.riskProbabilities[t]||0)*100) | number:'1.0-0' }}%</span>
+          </div>
+        }
+      </div>
+
+      <!-- Key metrics -->
+      <div class="psect">
+        <div class="psect-ttl">Key Metrics</div>
+        <div class="mbox-grid">
+          @for (m of [
+            {v: panel()!.daysSinceLastBreakdown+'d', l:'Since Last BD'},
+            {v: panel()!.daysSinceLastPreventive+'d', l:'Since Preventive'},
+            {v: ''+panel()!.cumBreakdowns, l:'Total Breakdowns'},
+            {v: (panel()!.totalDowntimeH | number:'1.0-1')+'h', l:'Total Downtime'},
+            {v: panel()!.powerKw+'kW', l:'Rated Power'},
+            {v: panel()!.daysUntilPredictedNext>0 ? panel()!.daysUntilPredictedNext+'d':'N/A', l:'Next BD Est.'}
+          ]; track m.l) {
+            <div class="mbox"><span class="mbox-v">{{ m.v }}</span><span class="mbox-l">{{ m.l }}</span></div>
+          }
+        </div>
+      </div>
+
+      <!-- Log form -->
+      <div class="psect">
+        <div class="psect-ttl">Log Intervention</div>
+        <form class="form" (ngSubmit)="logFix()">
+          <input type="hidden" [(ngModel)]="fixForm.machineCode" name="mc"/>
+          <div class="frow">
+            <label>Machine</label>
+            <div class="machine-tag">{{ panel()!.machineCode }} — {{ panel()!.machineName }}</div>
+          </div>
+          <div class="frow">
+            <label>Date</label>
+            <input type="date" [(ngModel)]="fixForm.eventDate" name="d" required/>
+          </div>
+          <div class="frow">
+            <label>Type</label>
+            <select [(ngModel)]="fixForm.interventionType" name="t">
+              <option value="C">C — Corrective (Breakdown Fixed)</option>
+              <option value="P">P — Preventive Maintenance</option>
+              <option value="G">G — Greasing / Lubrication</option>
+              <option value="Q">Q — Quality Check</option>
+              <option value="IC">IC — Inspection Corrective</option>
+              <option value="PP">PP — Planned Preventive</option>
+              <option value="INS">INS — Installation</option>
+            </select>
+          </div>
+          <div class="frow">
+            <label>Duration (hours)</label>
+            <input type="number" [(ngModel)]="fixForm.durationH" name="dur" min="0.25" step="0.25" required/>
+          </div>
+          <div class="frow">
+            <label>Technician ID</label>
+            <input type="text" [(ngModel)]="fixForm.technicianId" name="tech" placeholder="e.g. MM, CK, OT"/>
+          </div>
+          <div class="frow">
+            <label>Notes</label>
+            <textarea [(ngModel)]="fixForm.notes" name="notes" rows="2" placeholder="Describe the intervention…"></textarea>
+          </div>
+          <button type="submit" class="btn btn--amber btn--full" [disabled]="submitting()">
+            {{ submitting() ? '⟳ Logging & Retraining…' : '✓ Log & Retrain Model' }}
+          </button>
+          @if (submitOk()) {
+            <div class="msg msg--ok">✓ Logged. Model retrained with new data.</div>
+          }
+          @if (submitErr()) {
+            <div class="msg msg--err">✗ {{ submitErr() }}</div>
+          }
+        </form>
+      </div>
+
+    </div>
+  </aside>
+}

@@ -1,0 +1,128 @@
+2026-05-03 12:43:31,599 [INFO] SICAME-ML - ============================================================
+2026-05-03 12:43:31,600 [INFO] SICAME-ML - SICAME Machine Breakdown Prediction Engine
+2026-05-03 12:43:31,600 [INFO] SICAME-ML - ============================================================
+2026-05-03 12:43:31,601 [INFO] SICAME-ML - DataManager initialised
+2026-05-03 12:43:31,611 [WARNING] SICAME-ML - Could not load saved models: [Errno 2] No such file or directory: 'sicame_models\\survival_model.pkl'
+2026-05-03 12:43:31,612 [INFO] SICAME-ML - No saved models found — training from scratch.
+2026-05-03 12:43:31,612 [INFO] SICAME-ML - === Training pipeline started ===
+2026-05-03 12:43:31,814 [INFO] SICAME-ML - Total records loaded: 319 (319 historical + 0 dashboard)
+2026-05-03 12:43:32,649 [INFO] SICAME-ML - Survival dataset built: 228 intervals, 186 observed events, 42 censored
+2026-05-03 12:43:33,134 [INFO] SICAME-ML - Cox model fitted. C-index: 0.7909, Events: 186
+2026-05-03 12:43:35,989 [INFO] SICAME-ML - Risk classifier CV F1 (weighted): 0.9673
+2026-05-03 12:43:36,137 [INFO] SICAME-ML - Models saved to sicame_models
+2026-05-03 12:43:36,147 [INFO] SICAME-ML - Training complete in 4.53s — {'status': 'trained', 'trained_at': '2026-05-03T11:43:35.989575', 'model_version': '2026-05-03-0e3650d5', 'elapsed_s': 4.53, 'n_records': 319, 'n_machines': 42, 'n_events': 186, 'cox_c_index': np.float64(0.7908781226343679), 'rf_cv_f1': 0.9673, 'survival_model': {'model_type': 'CoxPH', 'n_events': 186, 'c_index': np.float64(0.7908781226343679), 'coefficients': {'coef': {'severity_last': -0.5751, 'mean_severity_3': -0.228, 'cum_C': -0.0168, 'p_ratio': -0.1952, 'days_since_preventive': -0.0002, 'rolling_7d_events': 0.415, 'rolling_30d_events': 0.0235, 'bd_rate_30d': 14.635}, 'exp(coef)': {'severity_last': 0.5626, 'mean_severity_3': 0.7961, 'cum_C': 0.9833, 'p_ratio': 0.8227, 'days_since_preventive': 0.9998, 'rolling_7d_events': 1.5143, 'rolling_30d_events': 1.0238, 'bd_rate_30d': 2269227.997}, 'p': {'severity_last': 0.0, 'mean_severity_3': 0.2343, 'cum_C': 0.5182, 'p_ratio': 0.2375, 'days_since_preventive': 0.7052, 'rolling_7d_events': 0.0001, 'rolling_30d_events': 0.3553, 'bd_rate_30d': 0.0}}}}
+2026-05-03 12:43:36,148 [INFO] SICAME-ML - Initial training: {'status': 'trained', 'trained_at': '2026-05-03T11:43:35.989575', 'model_version': '2026-05-03-0e3650d5', 'elapsed_s': 4.53, 'n_records': 319, 'n_machines': 42, 'n_events': 186, 'cox_c_index': np.float64(0.7908781226343679), 'rf_cv_f1': 0.9673, 'survival_model': {'model_type': 'CoxPH', 'n_events': 186, 'c_index': np.float64(0.7908781226343679), 'coefficients': {'coef': {'severity_last': -0.5751, 'mean_severity_3': -0.228, 'cum_C': -0.0168, 'p_ratio': -0.1952, 'days_since_preventive': -0.0002, 'rolling_7d_events': 0.415, 'rolling_30d_events': 0.0235, 'bd_rate_30d': 14.635}, 'exp(coef)': {'severity_last': 0.5626, 'mean_severity_3': 0.7961, 'cum_C': 0.9833, 'p_ratio': 0.8227, 'days_since_preventive': 0.9998, 'rolling_7d_events': 1.5143, 'rolling_30d_events': 1.0238, 'bd_rate_30d': 2269227.997}, 'p': {'severity_last': 0.0, 'mean_severity_3': 0.2343, 'cum_C': 0.5182, 'p_ratio': 0.2375, 'days_since_preventive': 0.7052, 'rolling_7d_events': 0.0001, 'rolling_30d_events': 0.3553, 'bd_rate_30d': 0.0}}}}
+2026-05-03 12:43:36,149 [INFO] SICAME-ML - Daily retrain scheduler started — fires at 02:00 local
+2026-05-03 12:43:36,194 [INFO] SICAME-ML - ML REST server listening on port 8765
+2026-05-07 14:24:08,531 [INFO] SICAME-ML - ============================================================
+2026-05-07 14:24:08,538 [INFO] SICAME-ML - SICAME Machine Breakdown Prediction Engine
+2026-05-07 14:24:08,543 [INFO] SICAME-ML - ============================================================
+2026-05-07 14:24:08,546 [INFO] SICAME-ML - DataManager initialised
+2026-05-07 14:24:08,916 [INFO] SICAME-ML - Models loaded — version 2026-05-03-0e3650d5, trained at 2026-05-03T11:43:35.989575
+2026-05-07 14:24:08,955 [INFO] SICAME-ML - Daily retrain scheduler started — fires at 02:00 local
+2026-05-07 14:24:09,088 [INFO] SICAME-ML - ML REST server listening on port 8765
+2026-05-07 14:27:46,966 [INFO] SICAME-ML - ============================================================
+2026-05-07 14:27:46,966 [INFO] SICAME-ML - SICAME Machine Breakdown Prediction Engine
+2026-05-07 14:27:46,966 [INFO] SICAME-ML - ============================================================
+2026-05-07 14:27:46,966 [INFO] SICAME-ML - DataManager initialised
+2026-05-07 14:27:47,051 [INFO] SICAME-ML - Models loaded — version 2026-05-03-0e3650d5, trained at 2026-05-03T11:43:35.989575
+2026-05-07 14:27:47,051 [INFO] SICAME-ML - Daily retrain scheduler started — fires at 02:00 local
+2026-05-07 14:27:47,068 [INFO] SICAME-ML - ML REST server listening on port 8765
+2026-05-07 14:30:21,483 [INFO] SICAME-ML - ============================================================
+2026-05-07 14:30:21,483 [INFO] SICAME-ML - SICAME Machine Breakdown Prediction Engine
+2026-05-07 14:30:21,483 [INFO] SICAME-ML - ============================================================
+2026-05-07 14:30:21,483 [INFO] SICAME-ML - DataManager initialised
+2026-05-07 14:30:21,546 [INFO] SICAME-ML - Models loaded — version 2026-05-03-0e3650d5, trained at 2026-05-03T11:43:35.989575
+2026-05-07 14:30:21,546 [INFO] SICAME-ML - Daily retrain scheduler started — fires at 02:00 local
+2026-05-07 14:30:21,578 [INFO] SICAME-ML - ML REST server listening on port 8765
+2026-05-07 14:32:04,463 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-07 14:33:05,571 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-07 14:33:18,846 [INFO] SICAME-ML - === Training pipeline started ===
+2026-05-07 14:33:18,895 [INFO] SICAME-ML - Total records loaded: 319 (319 historical + 0 dashboard)
+2026-05-07 14:33:19,926 [INFO] SICAME-ML - Survival dataset built: 228 intervals, 186 observed events, 42 censored
+2026-05-07 14:33:20,272 [INFO] SICAME-ML - Cox model fitted. C-index: 0.7909, Events: 186
+2026-05-07 14:33:22,725 [INFO] SICAME-ML - Risk classifier CV F1 (weighted): 0.9673
+2026-05-07 14:33:22,826 [INFO] SICAME-ML - Models saved to sicame_models
+2026-05-07 14:33:22,826 [INFO] SICAME-ML - Training complete in 3.98s — {'status': 'trained', 'trained_at': '2026-05-07T13:33:22.725017', 'model_version': '2026-05-07-0e3650d5', 'elapsed_s': 3.98, 'n_records': 319, 'n_machines': 42, 'n_events': 186, 'cox_c_index': np.float64(0.7908781226343679), 'rf_cv_f1': 0.9673, 'survival_model': {'model_type': 'CoxPH', 'n_events': 186, 'c_index': np.float64(0.7908781226343679), 'coefficients': {'coef': {'severity_last': -0.5751, 'mean_severity_3': -0.228, 'cum_C': -0.0168, 'p_ratio': -0.1952, 'days_since_preventive': -0.0002, 'rolling_7d_events': 0.415, 'rolling_30d_events': 0.0235, 'bd_rate_30d': 14.635}, 'exp(coef)': {'severity_last': 0.5626, 'mean_severity_3': 0.7961, 'cum_C': 0.9833, 'p_ratio': 0.8227, 'days_since_preventive': 0.9998, 'rolling_7d_events': 1.5143, 'rolling_30d_events': 1.0238, 'bd_rate_30d': 2269227.997}, 'p': {'severity_last': 0.0, 'mean_severity_3': 0.2343, 'cum_C': 0.5182, 'p_ratio': 0.2375, 'days_since_preventive': 0.7052, 'rolling_7d_events': 0.0001, 'rolling_30d_events': 0.3553, 'bd_rate_30d': 0.0}}}}
+2026-05-07 14:33:25,316 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-08 11:04:51,878 [INFO] SICAME-ML - ============================================================
+2026-05-08 11:04:51,878 [INFO] SICAME-ML - SICAME Machine Breakdown Prediction Engine
+2026-05-08 11:04:51,878 [INFO] SICAME-ML - ============================================================
+2026-05-08 11:04:51,879 [INFO] SICAME-ML - DataManager initialised
+2026-05-08 11:04:52,071 [INFO] SICAME-ML - Models loaded — version 2026-05-07-0e3650d5, trained at 2026-05-07T13:33:22.725017
+2026-05-08 11:04:52,071 [INFO] SICAME-ML - Daily retrain scheduler started — fires at 02:00 local
+2026-05-08 11:04:52,087 [INFO] SICAME-ML - ML REST server listening on port 8765
+2026-05-08 11:16:52,057 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-08 11:21:07,668 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-08 11:22:10,350 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 07:31:30,705 [INFO] SICAME-ML - ============================================================
+2026-05-10 07:31:30,723 [INFO] SICAME-ML - SICAME Machine Breakdown Prediction Engine (Dual Pipeline)
+2026-05-10 07:31:30,723 [INFO] SICAME-ML - ============================================================
+2026-05-10 07:31:30,723 [INFO] SICAME-ML - DataManager initialised
+2026-05-10 07:31:30,847 [WARNING] SICAME-ML - Could not load saved models: [Errno 2] No such file or directory: 'sicame_models\\classical_ml.pkl'
+2026-05-10 07:31:30,847 [INFO] SICAME-ML - No saved models — training from scratch.
+2026-05-10 07:31:30,847 [INFO] SICAME-ML - === Training pipeline started ===
+2026-05-10 07:31:30,905 [INFO] SICAME-ML - Total records loaded: 319 (319 historical + 0 dashboard)
+2026-05-10 07:31:31,910 [INFO] SICAME-ML - Survival dataset built: 228 intervals, 186 observed events, 42 censored
+2026-05-10 07:31:32,363 [INFO] SICAME-ML - Cox model fitted. C-index: 0.8001, Events: 186
+2026-05-10 07:31:37,583 [INFO] SICAME-ML - Risk classifier CV F1 (weighted): 0.8436
+2026-05-10 07:31:37,599 [INFO] SICAME-ML - Classical ML Pipeline — training started
+2026-05-10 07:31:38,408 [INFO] SICAME-ML -   Reg [Linear Regression] MAE=31.9d R²=0.156
+2026-05-10 07:31:45,063 [INFO] SICAME-ML -   Reg [Ridge (α=best)] MAE=32.5d R²=0.084
+2026-05-10 07:31:45,128 [INFO] SICAME-ML -   Reg [Lasso (α=best)] MAE=34.5d R²=0.012
+2026-05-10 07:31:46,052 [INFO] SICAME-ML -   Reg [Random Forest] MAE=22.8d R²=0.553
+2026-05-10 07:31:46,466 [INFO] SICAME-ML -   Reg [Gradient Boosting] MAE=6.1d R²=0.915
+2026-05-10 07:31:46,697 [INFO] SICAME-ML -   Reg [XGBoost] MAE=6.9d R²=0.916
+2026-05-10 07:31:46,697 [INFO] SICAME-ML - Best regressor: Gradient Boosting MAE=6.1
+2026-05-10 07:31:46,713 [INFO] SICAME-ML -   Clf [Logistic Regression] AUC=0.740
+2026-05-10 07:31:47,308 [INFO] SICAME-ML -   Clf [Random Forest] AUC=0.986
+2026-05-10 07:31:47,499 [INFO] SICAME-ML -   Clf [Gradient Boosting] AUC=0.996
+2026-05-10 07:31:47,576 [INFO] SICAME-ML -   Clf [XGBoost] AUC=0.991
+2026-05-10 07:31:47,576 [INFO] SICAME-ML - Best classifier: Gradient Boosting AUC=0.996
+2026-05-10 07:31:47,576 [INFO] SICAME-ML - Classical ML Pipeline — training complete
+2026-05-10 07:31:48,129 [INFO] SICAME-ML - Models saved to sicame_models
+2026-05-10 07:31:48,129 [INFO] SICAME-ML - Training complete in 17.28s — {'status': 'trained', 'trained_at': '2026-05-10T06:31:47.578356', 'model_version': '2026-05-10-b11e7d0e', 'elapsed_s': 17.28, 'n_records': 319, 'n_machines': 42, 'n_events': 186, 'cox_c_index': np.float64(0.8001093447724787), 'rf_cv_f1': 0.8436, 'survival_model': {'model_type': 'CoxPH', 'n_events': 186, 'c_index': np.float64(0.8001093447724787), 'rf_cv_f1': 0.8436, 'coefficients': {'coef': {'last_severity': -0.606, 'mean_severity_3': -0.2762, 'cum_breakdowns': -0.0199, 'p_ratio': -0.2018, 'days_since_last_preventive': -0.0003, 'rolling_7d_events': 0.254, 'rolling_30d_events': 0.1141, 'bd_rate_30d': 9.0457}, 'exp(coef)': {'last_severity': 0.5455, 'mean_severity_3': 0.7586, 'cum_breakdowns': 0.9803, 'p_ratio': 0.8173, 'days_since_last_preventive': 0.9997, 'rolling_7d_events': 1.2891, 'rolling_30d_events': 1.1209, 'bd_rate_30d': 8481.9982}, 'p': {'last_severity': 0.0, 'mean_severity_3': 0.1498, 'cum_breakdowns': 0.4425, 'p_ratio': 0.2143, 'days_since_last_preventive': 0.6095, 'rolling_7d_events': 0.0001, 'rolling_30d_events': 0.1272, 'bd_rate_30d': 0.0409}}}, 'classical_ml': {'fitted': True, 'best_regressor': 'Gradient Boosting', 'best_regressor_mae': 6.1, 'best_classifier': 'Gradient Boosting', 'best_classifier_auc': np.float64(0.996), 'avg_curative_h': 1.44, 'avg_preventive_h': 0.84}}
+2026-05-10 07:31:48,131 [INFO] SICAME-ML - Scheduler started — fires at 02:00
+2026-05-10 07:31:48,165 [INFO] SICAME-ML - ML REST server listening on port 8765
+2026-05-10 07:34:11,910 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 10:00:01,081 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 10:10:00,737 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 10:20:01,191 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 10:30:01,113 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 10:40:01,350 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 10:50:01,334 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 11:00:01,440 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 11:10:53,446 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 11:20:53,364 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 11:30:53,349 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 11:40:53,352 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 11:50:53,472 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 12:00:53,502 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 12:32:50,795 [INFO] SICAME-ML - ============================================================
+2026-05-10 12:32:50,795 [INFO] SICAME-ML - SICAME Machine Breakdown Prediction Engine (Dual Pipeline)
+2026-05-10 12:32:50,795 [INFO] SICAME-ML - ============================================================
+2026-05-10 12:32:50,795 [INFO] SICAME-ML - DataManager initialised
+2026-05-10 12:32:51,258 [INFO] SICAME-ML - Models loaded — version 2026-05-10-b11e7d0e
+2026-05-10 12:32:51,260 [INFO] SICAME-ML - Scheduler started — fires at 02:00
+2026-05-10 12:32:51,297 [INFO] SICAME-ML - ML REST server listening on port 8765
+2026-05-10 12:34:02,258 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 12:35:38,409 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 12:35:40,963 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 12:45:38,106 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 17:22:35,380 [INFO] SICAME-ML - ============================================================
+2026-05-10 17:22:35,381 [INFO] SICAME-ML - SICAME Machine Breakdown Prediction Engine (Dual Pipeline)
+2026-05-10 17:22:35,381 [INFO] SICAME-ML - ============================================================
+2026-05-10 17:22:35,382 [INFO] SICAME-ML - DataManager initialised
+2026-05-10 17:22:36,703 [INFO] SICAME-ML - Models loaded — version 2026-05-10-b11e7d0e
+2026-05-10 17:22:36,705 [INFO] SICAME-ML - Scheduler started — fires at 02:00
+2026-05-10 17:22:36,740 [INFO] SICAME-ML - ML REST server listening on port 8765
+2026-05-10 17:24:06,753 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-10 17:30:48,799 [INFO] SICAME-ML - Predictions generated for 42 machines.
+2026-05-12 22:28:24,377 [INFO] SICAME-ML - ============================================================
+2026-05-12 22:28:24,377 [INFO] SICAME-ML - SICAME Machine Breakdown Prediction Engine (Dual Pipeline)
+2026-05-12 22:28:24,428 [INFO] SICAME-ML - ============================================================
+2026-05-12 22:28:24,428 [INFO] SICAME-ML - DataManager initialised
+2026-05-12 22:28:25,526 [INFO] SICAME-ML - Models loaded — version 2026-05-10-b11e7d0e
+2026-05-12 22:28:25,526 [INFO] SICAME-ML - Scheduler started — fires at 02:00
+2026-05-12 22:28:25,599 [INFO] SICAME-ML - ML REST server listening on port 8765
+2026-05-12 22:35:55,921 [INFO] SICAME-ML - Predictions generated for 42 machines.
